@@ -1,0 +1,120 @@
+*************************************************************************************************************
+in python script:
+=================
+
+import pymssql
+
+SQLserver = "Server80"  # nastavení v souborech /etc/odbc.ini, /etc/odbcinst.ini, /etc/freetds/freetds.conf
+username = "supercharger@lizard"  # format: username@domain (domain.database.windows.net)
+password = "fJR88I#XtGs2"
+dbname = "charger_develop"
+
+    for key, value in MPPTdata.items():
+        subQ_IdParam = "(SELECT Id FROM StationParameters WHERE Name = '"+key+"')"
+        Query = "INSERT INTO StationData (StationId, Parameter, Value) VALUES ("+stationID+","+subQ_IdParam+","+str(value)+")"
+        try:
+            cursor.callproc('SetStationData', (stationID, key, value))
+        except:
+            print("Read/Write database error!")
+            continue
+
+
+
+        # ~ try:
+    # ~ azure = pymssql.connect(SQLserver, username, password, dbname)
+    # ~ except:
+    # ~ print("Connection to database error!")
+    # ~ azureErr = azureErr + 1
+    # ~ continue
+
+    # ~ cursor = azure.cursor()
+
+    # ~ azure.commit()
+    # ~ azure.close()
+
+
+*************************************************************************************************************
+
+
+
+raspberry pi config:
+====================
+
+    # autostart:
+    # Python soubor-->vlastnosti-->práva-->spustit:kdokoliv
+    # hashbang Python script: #!/bin/bash
+    # do /home/pi vytvořit launcher.sh
+    # launcher.sh:
+    ##!/bin/bash
+    # echo "Starting MPPT2Azure.py"
+    # python3 /home/pi/Desktop/MPPT2Azure.py
+    # launcher.sh-->vlastnosti-->práva-->spustit:kdokoliv
+    # sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+    # přidat:
+    # @lxterminal -e /home/pi/launcher.sh
+
+    # Soubor: /etc/odbc.ini
+    # [MSSQL8]
+    # Driver = FreeTDS
+    # Description = MSSQL Server
+    # Trace = No
+    # Servername = Server80
+    # Server = lizard.database.windows.net      # IP or host name of the Sql Server
+    # Database = charger_develop      # DataBase Name
+    # Port = 1433           # This is default
+    # TDS_Version = 8.0
+
+    # Soubor: /etc/odbcinst.ini
+    # [FreeTDS]
+    # Description = FreeTDS unixODBC Driver
+    # Driver = /usr/lib/arm-linux-gnueabihf/odbc/libtdsodbc.so
+    # Setup = /usr/lib/arm-linux-gnueabihf/odbc/libtdsodbc.so
+    # UsageCount = 1
+
+    # Soubor: /etc/freetds/freetds.conf
+    ##   $Id: freetds.conf,v 1.12 2007/12/25 06:02:36 jklowden Exp $
+    ##
+    ## This file is installed by FreeTDS if no file by the same
+    ## name is found in the installation directory.
+    ##
+    ## For information about the layout of this file and its settings,
+    ## see the freetds.conf manpage "man freetds.conf".
+
+    ## Global settings are overridden by those in a database
+    ## server specific section
+    # [global]
+    ## TDS protocol version
+    # ;	tds version = 4.2
+
+    ## Whether to write a TDSDUMP file for diagnostic purposes
+    ## (setting this to /tmp is insecure on a multi-user system)
+    # ;	dump file = /tmp/freetds.log
+    # ;	debug flags = 0xffff
+
+    ## Command and connection timeouts
+    # ;	timeout = 10
+    # ;	connect timeout = 10
+
+    ## If you get out-of-memory errors, it may mean that your client
+    ## is trying to allocate a huge buffer for a TEXT field.
+    ## Try setting 'text size' to a more reasonable limit
+    # text size = 64512
+
+    ## A typical Sybase server
+    # [egServer50]
+    # host = symachine.domain.com
+    # port = 5000
+    # tds version = 5.0
+
+    ## A typical Microsoft server
+    # [egServer70]
+    # host = ntmachine.domain.com
+    # port = 1433
+    # tds version = 7.0
+
+    # [Server80]
+    # host = lizard.database.windows.net   # Remote Sql Server's IP addr
+    # port = 1433           # this is default
+    # tds version = 8.0     # this is by the time i post this
+    # client charset = UTF-8
+    ##instance = charger_develop     # your Database name
